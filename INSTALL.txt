@@ -1,0 +1,11 @@
+Install
+-------
+
+
+Thanks for downloading TileLite.
+
+To install it, run the following command inside this directory::
+
+    $ python setup.py install
+
+Then read the instructions in the 'docs' folder.

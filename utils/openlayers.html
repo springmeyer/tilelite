@@ -1,0 +1,199 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>TileLite Mapnik Server</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <style type="text/css">
+    html, body { height: 100%; }
+    body {margin: 0px;}
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+
+<!--<script src="local_js/OpenLayers.js"></script>
+<script src="local_js/OpenStreetMap.js"></script>
+<script type="text/javascript" src="local_js/jquery.min.js"></script>-->
+
+<script src="http://dev.openlayers.org/nightly/OpenLayers.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js"></script>
+<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key="></script>
+
+
+
+<script type="text/javascript">
+        var map, osm_official_tiles, tilelite_layer;
+        
+        var enable_gmaps = true;
+        
+        function getZoom(e) {
+            $('#zoom')[0].innerHTML = 'Zoom: ' + map.getZoom();
+        }
+        
+        
+        function init() {
+            
+            // Options for World Map in Google Spherical Mercator Projection
+            var options = { 
+                maxResolution: 156543.0339,
+                units: 'm',
+                projection: new OpenLayers.Projection("EPSG:900913"),
+                maxExtent: new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34),
+                //restrictedExtent: new OpenLayers.Bounds(16770012,-4044490,16876903,-3980726),
+                };
+            
+             function getTileURL (bounds) {
+                var res = this.map.getResolution();
+                var x = Math.round((bounds.left - this.maxExtent.left) / (res * this.tileSize.w));
+                var y = Math.round((this.maxExtent.top - bounds.top) / (res * this.tileSize.h));
+                var z = this.map.getZoom();
+                var limit = Math.pow(2, z);
+                if (y < 0 || y >= limit)
+                {
+                    return ""; // Tile not found. Use Firefox and Firebug to see url requested
+                }
+                else
+                {
+                    x = ((x % limit) + limit) % limit;       
+                    var url = this.url;
+                    var path = z + "/" + x + "/" + y + ".png";
+                    if (url instanceof Array)
+                    {
+                        url = this.selectUrl(path, url);
+                    }
+                    return url + path;
+                }
+            }
+            
+            map = new OpenLayers.Map("map", options);
+            
+            function maxResForTileSize(tileSize){
+                //var pi = 3.1415926535900001;
+                //return 6378137 * 2 * pi/tileSize
+                return map.maxExtent.getWidth()/tileSize
+            }
+            
+            
+            var tiles_url = "http://localhost:8000/"            
+           
+            // Note this is an openlayers/browser trick for pointing to multiple urls for speed,
+            // TileLite just happens to work with it out of the box since it ignores any url prefix
+            var servers = [tiles_url+'a/',tiles_url+'b/',tiles_url+'c/']
+            
+            var xyz_servers = [tiles_url+'a/${z}/${x}/${y}.png',tiles_url+'b/${z}/${x}/${y}.png',tiles_url+'c/${z}/${x}/${y}.png']
+
+            // Create an OSM-like tiling layer from a TileCache layer by overriding the 'getURL()'
+            // http://trac.openlayers.org/browser/trunk/openlayers/lib/OpenLayers/Layer/TileCache.js#L75
+            // http://trac.openlayers.org/ticket/1950         
+            var tilelite_64 = new OpenLayers.Layer.TileCache("Tilelite - serving 64 pixel tiles", servers,
+                    "dummy", // layername: unused but must be set
+                        {   type: "png",
+                            getURL: getTileURL,
+                            maxResolution: maxResForTileSize(64),
+                            gutter:0,
+                            buffer:0,
+                            tileSize: new OpenLayers.Size(64,64),
+                            transitionEffect:'resize'
+                        }
+                    );
+            
+            tilelite_256 = new OpenLayers.Layer.TileCache("Tilelite - serving 256 pixel tiles", servers,
+                    "dummy", // layername: unused but must be set
+                        {   type: "png",
+                            getURL: getTileURL,
+                            maxResolution: maxResForTileSize(256),
+                            gutter:0,
+                            buffer:0,
+                            transitionEffect:'resize'
+                        }
+                    );
+
+            var tilelite_512 = new OpenLayers.Layer.TileCache("Tilelite - serving 512 pixel tiles", servers,
+                    "dummy", // layername: unused but must be set
+                        {   type: "png",
+                            getURL: getTileURL,
+                            maxResolution: maxResForTileSize(512),
+                            gutter:0,
+                            buffer:0,
+                            tileSize: new OpenLayers.Size(512,512),
+                            transitionEffect:'resize'
+                        }
+                    );
+            
+            /*
+            var wms = new OpenLayers.Layer.TileCache( "Sydney", 
+                    ['http://mapserver-tile-1.osgeo.org/tilecache',
+                    'http://mapserver-tile-2.osgeo.org/tilecache'],
+                    'osm',
+                    {
+                      maxExtent: new OpenLayers.Bounds(-20000000,-20000000,20000000,20000000),
+                      scales: [10000,25000,50000,100000,250000,500000,1000000,2500000,5000000,10000000],
+                      units: 'm',
+                      projection:new OpenLayers.Projection("EPSG:900913"),
+                      buffer:0,
+                      isBaselayer:true
+                    } );
+            */
+                                            
+            // Alternate way of creating a tilelite layer -> borrow from the OSM layer contructor but repoint urls to localhost
+            //new OpenLayers.Layer.Google( "Google Terrain", {type: G_PHYSICAL_MAP, 'sphericalMercator': true} );
+            tilelite_layer = new OpenLayers.Layer.OSM("TileLite Server Layer from OSM Layer (256 px tiles)");
+            tilelite_layer.url = xyz_servers;
+            //tilelite_layer.sphericalMercator = true;
+            tilelite_layer.buffer = 0;
+            tilelite_layer.attribution = "Data served by <a href='http://bitbucket.org/springmeyer/tilelite/'>TileLite </a>"
+            //tilelite_layer.setIsBaseLayer(false);
+            //tilelite_layer.transitionEffect = null;
+            
+            // Uses linked OpenStreetMap.js from openstreetmap as a comparison layer
+            osm_official_tiles = new OpenLayers.Layer.OSM("OpenStreetMap (Mapnik)");
+            osm_official_tiles.attribution = "Map Data CC-BY-SA Openstreetmap.org"
+                                     
+            map.addLayers([tilelite_layer,osm_official_tiles,tilelite_64,tilelite_256,tilelite_512]);
+            
+
+            if (enable_gmaps) {
+                var gphy = new OpenLayers.Layer.Google( "Google Terrain", {type: G_PHYSICAL_MAP, 'sphericalMercator': true} );
+                var gmap = new OpenLayers.Layer.Google( "Google Streets", {'sphericalMercator': true});
+                var ghyb = new OpenLayers.Layer.Google("Google Satellite", {type: G_HYBRID_MAP, 'sphericalMercator': true} );
+                map.addLayers([ghyb, gmap, gphy]);
+            }
+            
+            
+            
+            map.addControl(new OpenLayers.Control.Scale());
+            map.addControl(new OpenLayers.Control.MousePosition());
+            map.addControl(new OpenLayers.Control.Navigation()); 
+            map.addControl(new OpenLayers.Control.PanZoom());
+            var ls = new OpenLayers.Control.LayerSwitcher()
+            map.addControl(ls);
+            ls.maximizeControl();
+            
+            //
+            //map.zoomToExtent(new OpenLayers.Bounds(-14301062.241481643,5702202.309052736,-12773544.668504298,6266001.829583203))
+            // http://localhost:8000/instance.json?jsoncallback=jsonp1237265183593&_=1237265183665
+            
+            function zoom_to_tilelite_extents() {                                
+                $.getJSON(tiles_url + "instance.json?jsoncallback=?",
+                  function(data){
+                    var e = data.extent;
+                    map.zoomToExtent(new OpenLayers.Bounds(e[0], e[1], e[2], e[3]));
+                  });
+            } 
+            zoom_to_tilelite_extents();
+            
+            map.events.register("moveend", map, getZoom);
+            map.events.register("zoomend", map, getZoom);
+            
+            //map.zoomToMaxExtent();
+            
+            }
+    </script>
+  </head>
+  <body onload="init()">
+     <h2 style="position:absolute; z-index:10000; left: 100px;">TileLite Mapnik Server</h2>
+     <h3 style="position:absolute; z-index:10000; bottom: 20px; left: 50px;" id="zoom">Zoom:</h3>
+    <div id="map">
+    </div>
+  </body>
+</html>

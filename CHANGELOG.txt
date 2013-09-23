@@ -1,0 +1,51 @@
+TileLite Changelog
+------------------
+
+Version 0.1.5, Novemeber 29th 2010:
+-----------------------------------
+
+Fix bug in spherical mercator handling
+
+Enable ?x=&y=&z= style requests
+
+
+Version 0.1.4, Novemeber 29th 2010:
+-----------------------------------
+  
+  * Support for Mapnik2
+  
+  * Support for Cascadenik 1.x
+  
+  * Ensured the liteserv.py development server runs in single thread
+  
+  * Better detection if map srs is spherical mercator to avoid setting it if not needed
+  
+  * Faster blank tile response, using rendering no-op
+  
+
+Version 0.1.3, September 24th 2009:
+---------------------------------
+  
+  * Improved response handling and demo application
+
+  * Improved support for Mapnik 0.5.1
+
+
+Version 0.1.2, August 30th 2009:
+--------------------------------
+
+  * Make extra data available to installer
+
+
+Version 0.1.1, August 30th 2009:
+--------------------------------
+
+  * Added a 'demo' directory with sample shp, mapnik xml, and html
+
+  * Enabled support for Mapnik 0.5.1 (Previously only worked with >= 0.6.0)
+
+
+Version 0.1.0, May 3rd 2009:
+----------------------------
+
+ * Tagged first release.

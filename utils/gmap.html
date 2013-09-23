@@ -1,0 +1,54 @@
+<html>
+  <head>
+    <title>TileLite Mapnik Server</title>
+    <script type="text/javascript" src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={your key here};sensor=false"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js"></script>
+    <style type="text/css">
+    html, body { height: 100%;}
+    body {margin: 0px;}
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+    </style>
+  </head>
+  <body>
+    <h2 style="position:absolute; z-index:1000; top: 30; left: 100px;"><a href='http://bitbucket.org/springmeyer/tilelite/'>TileLite Mapnik Server</a></h2>
+    <div id="map">
+    </div>
+    <script type="text/javascript" defer="defer">
+      
+              
+      var gmap = new GMap2(document.getElementById('map'));
+      
+      var tiles_url = 'http://localhost:8000/';
+      
+      gmap.addControl(new GSmallMapControl());
+      
+      var osm = new GTileLayerOverlay(
+        new GTileLayer(null, null, null, {
+          tileUrlTemplate: tiles_url + '{Z}/{X}/{Y}.png',
+          isPng: true
+        })
+      );
+
+      // initialize map zoom...
+      gmap.setCenter(new GLatLng(0,0), 1);
+      
+      // then zoom to the data extent... 
+      function zoom_to_tilelite_extents() {                                
+          $.getJSON( tiles_url + "instance.json?jsoncallback=?",
+            function(data){
+              var e = data.lonlat_extent;
+              var bounds = new GLatLngBounds(new GLatLng(e[1],e[0]),new GLatLng(e[3],e[2]));
+              gmap.setZoom(gmap.getBoundsZoomLevel(bounds));
+              gmap.setCenter(bounds.getCenter());
+            });
+      } 
+      zoom_to_tilelite_extents();
+      
+      gmap.addOverlay(osm);
+
+    </script>
+  </body>
+</html>
