@@ -3,15 +3,15 @@ from distutils.core import setup
 version = '0.1.5'
 app = 'tilelite'
 description = 'Lightweight WSGI tile-server, written in Python, using Mapnik rendering and designed to serve tiles in the OSM/Google scheme.'
-url = 'http://bitbucket.org/springmeyer/%s/' % app
-readme = file('README.txt','rb').read()
+url = 'https://github.com/springmeyer/tilelite'
+readme = file('README.md','rb').read()
 
 setup(name='%s' % app,
       version=version,
       description=description,
       #long_description=readme,
       author='Dane Springmeyer',
-      author_email='dbsgeo@gmail.com',
+      author_email='dane@dbsgeo.com',
       requires=['Mapnik'],
       keywords='mapnik,gis,geospatial,openstreetmap,tiles,cache',
       license='BSD',

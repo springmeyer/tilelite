@@ -6,18 +6,13 @@ __version__ = '0.1.5'
 __license__ = 'BSD'
 
 import os
-#import re
 import sys
 import time
 import math
 import urllib
 import tempfile
 import logging
-
-try:
-    import mapnik2 as mapnik
-except ImportError:
-    import mapnik
+import mapnik
 
 # http://spatialreference.org/ref/epsg/3785/proj4/
 #"+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
@@ -426,11 +421,10 @@ class Server(object):
                 <p>or</p>
                 <p>%(root)s/?x=0&y=0&z=0&format=png</p>
                 <p>Example url: <a href="%(root)s/1/0/0.png">%(root)s/1/0/0.png</a></p>
-                <p>js: var tiles = new OpenLayers.Layer.OSM("Mapnik", "http://%(http_host)s/${z}/${x}/${y}.png");</p>
                 <p>See TileLite settings: <a href="%(root)s/settings/">%(root)s/settings/</a>
                 | <a href="%(root)s/settings.json">%(root)s/settings.json</a></p>
-                <p> More info: <a href="http://bitbucket.org/springmeyer/tilelite/">
-                bitbucket.org/springmeyer/tilelite/</a></p></div>
+                <p> More info: <a href="https://github.com/springmeyer/tilelite/">
+                github.com/springmeyer/tilelite</a></p></div>
                 ''' % {'root': root,'style':CSS_STYLE,'http_host':environ['HTTP_HOST']}
             else:
                 response = '<h1> Page Not found </h1>'
