@@ -6,7 +6,7 @@ A gateway tool to [TileStache](http://tilestache.org/) or [TileCache](http://til
 
 ## Status
 
-- Written originally in 2009/2010 and versioned at https://bitbucket.org/springmeyer/tilelite
+- Written originally in 2008/2009 (first release was May 3rd 2009) and versioned at https://bitbucket.org/springmeyer/tilelite
 - Moved from https://bitbucket.org/springmeyer/tilelite to github in 2013
 - Not currently developed or maintained.
 
