@@ -4,6 +4,12 @@ A lightweight, multi-process, tile-server using Mapnik.
 
 A gateway tool to [TileStache](http://tilestache.org/) or [TileCache](http://tilecache.org).
 
+## Status
+
+- Written originally in 2009/2010 and versioned at https://bitbucket.org/springmeyer/tilelite
+- Moved from https://bitbucket.org/springmeyer/tilelite to github (here in 2013)
+- Not currently developed or maintained.
+
 ## Depends
 
  - Python 2.x
